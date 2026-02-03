@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VentaX | Ultimate AI Intelligence</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #000000;
+            --fg: #ffffff;
+            --gray: #888;
+            --gray-dark: #0a0a0a;
+            --accent: #fff;
+            --border: rgba(255,255,255,0.08);
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+
+            /* Safe area (iPhone notch etc) */
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+            --sal: env(safe-area-inset-left, 0px);
+            --sar: env(safe-area-inset-right, 0px);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* =========================================================
+           CURSOR: mostrar só o personalizado (desktop)
+           ========================================================= */
+        html, body { cursor: none; }
+        a, button { cursor: none; }
+        input, textarea { cursor: text; } /* mantém usabilidade em campos */
+
+        /* Touch devices: não faz sentido esconder cursor */
+        @media (hover: none) and (pointer: coarse) {
+            html, body { cursor: auto; }
+            #cursor { display: none !important; }
+        }
+
+        /* --- Custom Cursor --- */
+        #cursor {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+        }
+
+        /* --- NAV --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: calc(2.5rem + var(--sat)) calc(4vw + var(--sal));
+            padding-right: calc(4vw + var(--sar));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        nav > * { pointer-events: auto; }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            width: 44px; /* aumentado para melhor visibilidade */
+            height: auto;
+            /* força o logo para branco em imagens rasterizadas */
+            filter: brightness(0) invert(1);
+            -webkit-filter: brightness(0) invert(1);
+            opacity: 1;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            opacity: 0.6;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-cta {
+            padding: 0.9rem 2rem;
+            border: 1px solid var(--fg);
+            border-radius: 100px;
+            color: var(--fg);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.5s var(--ease);
+            position: relative;
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .btn-cta:hover {
+            background: var(--fg);
+            color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+        }
+
+        /* =========================================================
+           HERO: corrigido para mobile (sem buraco / sem esmagar)
+           - usa 100svh/100dvh pra evitar "vazio" no final no celular
+           ========================================================= */
+        .hero {
+            /* fallback */
+            min-height: 100vh;
+            /* evita bug de 100vh no mobile */
+            min-height: 100svh;
+            min-height: 100dvh;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+
+            padding-bottom: calc(2.5rem + var(--sab));
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(3rem, 14vw, 11rem);
+            line-height: 0.85;
+            font-weight: 900;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            letter-spacing: -0.04em;
+
+            padding: 0 4vw;
+        }
+
+        .hero-title span {
+            display: block;
+            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-img-wrap {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(90vh, 980px);
+            z-index: 1;
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .hero-img-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: brightness(0.8);
+        }
+
+        .hero-stats {
+            position: absolute;
+            bottom: calc(5vh + var(--sab));
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 calc(4vw + var(--sal));
+            padding-right: calc(4vw + var(--sar));
+            z-index: 20;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.4;
+        }
+
+        /* --- HORIZONTAL SCROLL --- */
+        .horizontal-wrap {
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        .horizontal-scroll {
+            display: flex;
+            width: 400%;
+            height: 100vh;
+        }
+
+        .h-section {
+            width: 100vw;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10vw;
+            border-right: 1px solid var(--border);
+        }
+
+        .h-section h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2rem, 8vw, 6rem);
+            font-weight: 200;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .h-section h2 span {
+            font-weight: 800;
+            display: block;
+            background: linear-gradient(90deg, #fff, #555);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- BENTO SECTION --- */
+        .bento-section {
+            padding: 20vh 4vw;
+        }
+
+        .grid-custom {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .card {
+            background: var(--gray-dark);
+            padding: 4.5rem;
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: border 0.5s var(--ease);
+        }
+
+        .card:hover {
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            margin-bottom: 1.8rem;
+            letter-spacing: -1px;
+            line-height: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card p {
+            color: var(--gray);
+            font-size: 1.15rem;
+            line-height: 1.6;
+            max-width: 85%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ✅ Sem height fixo: evita cortes */
+        .c-1 { grid-column: span 8; min-height: 550px; }
+        .c-2 { grid-column: span 4; min-height: 550px; }
+        .c-3 { grid-column: span 12; min-height: 450px; display: flex; align-items: center; gap: 28px; }
+
+        /* --- Card glow sutil --- */
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: radial-gradient(600px 300px at 20% 20%, rgba(255,255,255,0.10), transparent 55%),
+                        radial-gradient(400px 220px at 90% 10%, rgba(255,255,255,0.06), transparent 60%),
+                        radial-gradient(500px 280px at 60% 100%, rgba(255,255,255,0.05), transparent 60%);
+            opacity: 0.22;
+            pointer-events: none;
+            transition: opacity 0.6s var(--ease);
+        }
+        .card:hover::before { opacity: 0.35; }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 30%, transparent 70%, rgba(0,0,0,0.35));
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        /* --- Estrutura interna dos cards --- */
+        .vx-wrap {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .vx-toprow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .vx-side-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.02);
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.75;
+            white-space: nowrap;
+        }
+
+        .vx-pulse {
+            width: 8px; height: 8px; border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 0 0 0 rgba(255,255,255,0.35);
+            animation: vxPulse 1.8s infinite;
+        }
+
+        @keyframes vxPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
+            70% { box-shadow: 0 0 0 12px rgba(255,255,255,0.00); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
+        }
+
+        .vx-meta-row {
+            margin-top: 6px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .vx-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.85);
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 700;
+            width: fit-content;
+        }
+
+        /* ✅ Ícones sem fundo (apenas o ícone) */
+        .vx-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.90);
+            flex: 0 0 auto;
+            font-size: 13px; /* mantém tamanho visual */
+            line-height: 1;
+            padding: 0;
+        }
+        .vx-icon i,
+        .vx-icon svg {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            font-size: inherit;
+            line-height: 1;
+            vertical-align: middle;
+            transform: translateY(-0.06em); /* pequeno ajuste ótico */
+        }
+
+        .vx-bullets {
+            margin-top: 2px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .vx-bullet {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            color: rgba(255,255,255,0.80);
+            font-size: 0.98rem;
+            line-height: 1.4;
+        }
+
+        .vx-bullet span {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.92rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .vx-mini {
+            margin-top: 6px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.02);
+            border-radius: 22px;
+            padding: 16px 18px;
+            overflow: hidden;
+        }
+
+        .vx-mini-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            opacity: 0.75;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .vx-mini-lines { display: grid; gap: 10px; }
+
+        .vx-line {
+            height: 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .vx-line::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            width: 55%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05));
+            border-radius: 999px;
+        }
+
+        .vx-line:nth-child(2)::before { width: 75%; opacity: 0.8; }
+        .vx-line:nth-child(3)::before { width: 40%; opacity: 0.65; }
+
+        .vx-right-stack {
+            margin-top: 16px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .vx-panel {
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.02);
+            border-radius: 22px;
+            padding: 16px 16px;
+        }
+
+        .vx-panel-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.66rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+
+        .vx-bar {
+            height: 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .vx-bar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            width: 82%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
+            border-radius: 999px;
+        }
+        .vx-bar.s2::before { width: 67%; opacity: 0.8; }
+        .vx-bar.s3::before { width: 93%; opacity: 0.9; }
+
+        .vx-list {
+            margin-top: 12px;
+            display: grid;
+            gap: 10px;
+            opacity: 0.86;
+        }
+
+        .vx-li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.80);
+        }
+
+        .vx-li em {
+            font-style: normal;
+            opacity: 0.55;
+            font-size: 0.78rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .vx-kpi {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .vx-kpi-item {
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.02);
+            border-radius: 22px;
+            padding: 16px 16px;
+        }
+
+        .vx-kpi-item b {
+            display: block;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .vx-kpi-item small {
+            display: block;
+            opacity: 0.55;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.62rem;
+            font-weight: 700;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            min-height: 100vh;
+            min-height: 100svh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #fff;
+            color: #000;
+            border-radius: 80px 80px 0 0;
+            padding: 0 4vw;
+            padding-bottom: calc(2rem + var(--sab));
+        }
+
+        .footer-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 900;
+            line-height: 0.8;
+            margin-bottom: 5rem;
+            letter-spacing: -6px;
+        }
+
+        /* --- LOADER --- */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Outfit';
+            font-size: 3rem;
+            font-weight: 200;
+        }
+
+        .hand-reveal-section {
+  min-height: 140vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: #000;
+  padding: 0 6vw;
+  overflow: hidden;
+}
+
+.hand-content {
+  width: 45%;
+  z-index: 20;
+  position: relative;
+}
+
+.hand-content .tag {
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.hand-content h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 7rem);
+  line-height: 0.9;
+  font-weight: 900;
+  margin-bottom: 2rem;
+}
+
+.hand-content p {
+  font-size: 1.2rem;
+  color: var(--gray);
+  max-width: 450px;
+  line-height: 1.6;
+}
+
+.hand-visual-area {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 60%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hand-image-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#robot-hand {
+  width: 120%;
+  height: auto;
+  object-fit: contain;
+
+  z-index: 5;
+  position: relative;
+}
+
+
+/* --- Neural Brain Section --- */
+.neural-brain-section{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  padding:10vh 6vw;
+  overflow:hidden;
+  background: radial-gradient(1200px 600px at 10% 20%, rgba(255,120,0,0.02), transparent 20%),
+              radial-gradient(1000px 400px at 90% 80%, rgba(0,255,200,0.01), transparent 20%),
+              #000;
+}
+
+/* container central */
+.brain-visual-wrap{
+  position:relative;
+  width:100%;
+  max-width:1200px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* imagem do cérebro */
+.brain-image{
+  width:60%;
+  max-width:600px;
+  position:relative;
+  z-index:2;
+  pointer-events:none;
+  filter: drop-shadow(0 0 50px rgba(255,120,0,0.12));
+  transform-origin:center;
+  transition: transform 0.6s var(--ease), filter 0.4s linear;
+}
+
+/* texto sobreposto */
+.brain-text-content{
+  position:absolute;
+  z-index:5;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  pointer-events:none;
+  gap:2rem;
+  padding:2rem;
+}
+
+/* etiqueta tipo tag */
+.brain-label{
+  font-family: 'JetBrains Mono', monospace;
+  font-size:0.75rem;
+  color:#ff8a00;
+  background: rgba(255,138,0,0.06);
+  padding:6px 12px;
+  border:1px solid rgba(255,138,0,0.25);
+  border-radius:6px;
+  display:inline-block;
+  pointer-events:auto;
+  letter-spacing:0.6px;
+}
+
+/* bloco de informações (node) */
+.brain-node{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-width:340px;
+  pointer-events:auto;
+  transform-origin:left center;
+}
+
+/* posições sugestivas - ajuste conforme imagem */
+.node-1{ top:10%; left:4%; }
+.node-2{ bottom:12%; right:4%; }
+
+/* títulos e parágrafos */
+.brain-node h3{
+  font-family:'Outfit', sans-serif;
+  font-size:clamp(1.5rem, 4vw, 3.2rem);
+  font-weight:900;
+  line-height:1;
+  color:#fff;
+}
+.brain-node p{
+  font-size:1rem;
+  color:var(--gray);
+  line-height:1.4;
+  max-width:320px;
+}
+
+/* fundo tipográfico grande */
+.neural-bg-text{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Outfit', sans-serif;
+  font-size:25vw;
+  font-weight:900;
+  color:rgba(255,255,255,0.02);
+  white-space:nowrap;
+  z-index:1;
+  pointer-events:none;
+  user-select:none;
+}
+
+/* pequena interação/hover (opcional) */
+.brain-node:hover .brain-label{ transform:translateY(-3px); }
+
+/* reveal básico caso precise de fallback sem JS */
+.reveal-up{ opacity:0; transform:translateY(20px); transition:all 0.7s var(--ease); }
+.reveal-up.is-visible{ opacity:1; transform:translateY(0); }
+
+/* responsivo */
+@media (max-width:1024px){
+  .brain-text-content{ position:relative; gap:40px; align-items:center; justify-content:center; text-align:center; }
+  .node-1, .node-2{ position:relative; left:auto; right:auto; top:auto; bottom:auto; transform:none; }
+  .brain-node p{ max-width:100%; }
+  .brain-image{ width:90%; max-width:none; }
+  .neural-bg-text{ font-size:40vw; opacity:0.018; }
+}
+
+/* HUD / scan */
+.scan-line {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, #fff, transparent);
+  left: 30%;
+  z-index: 10;
+  box-shadow: 0 0 20px #fff;
+  opacity: 0;
+}
+
+.hud-circle {
+  position: absolute;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.hud-data-points {
+  position: absolute;
+  font-family: monospace;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.4);
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Optional helper classes to replace inline styles */
+.hud-circle--small { width: 400px; height: 400px; }
+.hud-circle--large { width: 600px; height: 600px; opacity: 0.05; }
+.hud-data--top-right { top: 20%; right: 10%; }
+.hud-data--bottom-left { bottom: 15%; left: 10%; }
+
+/* reveal helper */
+.reveal-up { will-change: transform, opacity; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hand-reveal-section { flex-direction: column; padding-top: 15vh; min-height: 100vh; }
+  .hand-content { width: 100%; text-align: center; margin-bottom: 5vh; }
+  .hand-content p { margin: 0 auto; }
+  .hand-visual-area { position: relative; width: 100%; height: 50vh; }
+  #robot-hand { width: 100%; }
+}
+
+        /* =========================================================
+           MOBILE FIX “DE VERDADE”
+           - hero central
+           - sem buraco
+           - nav mais limpo
+           ========================================================= */
+        @media (max-width: 900px) {
+            .horizontal-scroll { display: none; }
+            .grid-custom { display: flex; flex-direction: column; }
+            .c-1, .c-2, .c-3 { min-height: auto; padding: 3rem 2rem; border-radius: 30px; }
+            .c-3 { flex-direction: column; align-items: flex-start; }
+
+            .nav-links { display: none; }
+
+            nav {
+                padding: calc(1.3rem + var(--sat)) 5vw;
+            }
+            .btn-cta {
+                padding: 0.75rem 1.3rem;
+                font-size: 0.7rem;
+            }
+
+            .hero-title {
+                font-size: clamp(2.4rem, 12vw, 4.2rem);
+                line-height: 0.9;
+                letter-spacing: -0.03em;
+                padding: 0 6vw;
+            }
+
+            .hero-img-wrap {
+                top: 58%;
+                width: min(92vw, 520px);
+                opacity: 0.92;
+            }
+
+            .hero-img-wrap img {
+                max-height: 62svh;
+                max-height: 62dvh;
+                object-fit: contain;
+            }
+
+            .hero-stats {
+                font-size: 0.58rem;
+                letter-spacing: 2px;
+                padding: 0 6vw;
+                bottom: calc(2.6vh + var(--sab));
+            }
+
+            .card p { max-width: 100%; }
+            .vx-kpi { grid-template-columns: 1fr; }
+        }
+
+        /* Extra small phones */
+        @media (max-width: 420px) {
+            .hero-stats { opacity: 0.32; }
+            .card { padding: 2.4rem 1.6rem; }
+            .card h3 { font-size: 2.2rem; }
+            .card p { font-size: 1.02rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loader">00</div>
+    <div id="cursor"></div>
+
+    <nav>
+        <div class="logo-box">
+            <img src="/logo-ventax.png" alt="Icon" class="logo-img">
+        </div>
+        <div class="nav-links">
+            <span>Tecnologia</span>
+            <span>Soluções</span>
+            <span>Segurança</span>
+        </div>
+        <a href="#" class="btn-cta js-whatsapp">Get Started</a>
+    </nav>
+
+    <section class="hero">
+        <h1 class="hero-title">
+            <span>ULTIMATE</span>
+            <span>INTELLIGENCE</span>
+        </h1>
+        <div class="hero-img-wrap">
+            <img src="robo.png" alt="VentaX AI Agent" id="hero-robot">
+        </div>
+        <div class="hero-stats">
+            <div>Precision: 99.8%</div>
+            <div>Active: 24/7/365</div>
+            <div>Response: &lt;1.2s</div>
+        </div>
+    </section>
+
+    <!-- Scroll Horizontal -->
+    <div class="horizontal-wrap">
+        <div class="horizontal-scroll">
+            <section class="h-section">
+                <h2>O atendimento<br><span>NÃO É MAIS HUMANO.</span></h2>
+            </section>
+            <section class="h-section">
+                <h2>É superior em<br><span>CADA INTERAÇÃO.</span></h2>
+            </section>
+            <section class="h-section">
+                <h2>Resultados reais em<br><span>TEMPO RECORDE.</span></h2>
+            </section>
+            <section class="h-section">
+                <h2>A revolução<br><span>COMEÇA AGORA.</span></h2>
+            </section>
+        </div>
+    </div>
+
+     <section class="hand-reveal-section">
+        <!-- Digital HUD Elements -->
+        <div class="hud-circle" style="width: 400px; height: 400px;"></div>
+        <div class="hud-circle" style="width: 600px; height: 600px; opacity: 0.05;"></div>
+        
+        <div class="hand-content">
+            <span class="tag">System Protocol 01</span>
+            <h2 class="reveal-up">O TOQUE DA<br>ESCALA.</h2>
+            <p class="reveal-up">Nossa IA não apenas responde, ela sente o timing perfeito da venda. Uma mão invisível que guia seu cliente do "oi" ao checkout.</p>
+        </div>
+
+        <div class="hand-visual-area">
+            <div class="scan-line"></div>
+            
+            <!-- HUD Data Points -->
+            <div class="hud-data-points" style="top: 20%; right: 10%;">[ ANALYZING_CONVERSATION ]<br>98.4% CONFIDENCE</div>
+            <div class="hud-data-points" style="bottom: 15%; left: 10%;">[ NEURAL_LINK_ESTABLISHED ]<br>LATENCY: 0.002ms</div>
+
+            <div class="hand-image-container">
+                <!-- Imagem original restaurada -->
+                <img src="mão-robo.png" alt="Robot Hand" id="robot-hand">
+            </div>
+        </div>
+    </section>
+
+     <section class="neural-brain-section">
+        <div class="neural-bg-text">PROCESS_CORE</div>
+        
+        <div class="brain-visual-wrap">
+            <div class="brain-text-content">
+                <div class="brain-node node-1 reveal-up">
+                    <span class="brain-label">NEURAL_SYNC v4.0</span>
+                    <h3>PENSAMENTO<br>CIRÚRGICO.</h3>
+                    <p>Milhões de parâmetros analisados em tempo real para garantir que nenhuma oportunidade seja desperdiçada.</p>
+                </div>
+
+                <div class="brain-node node-2 reveal-up">
+                    <span class="brain-label">DEEP_LEARNING_ACTIVE</span>
+                    <h3>EVOLUÇÃO<br>CONTÍNUA.</h3>
+                    <p>Cada conversa alimenta a rede, tornando o seu atendimento mais persuasivo a cada segundo de operação.</p>
+                </div>
+            </div>
+
+            <img src="cerebro.png" alt="Cyber Brain" class="brain-image" id="cyber-brain">
+        </div>
+    </section>
+
+    <!-- Features Bento -->
+    <section class="bento-section">
+        <div class="grid-custom">
+
+            <!-- CARD 1 -->
+            <div class="card c-1 reveal">
+                <div class="vx-wrap">
+                    <div class="vx-toprow">
+                        <div class="vx-side-note"><span class="vx-pulse"></span>LIVE</div>
+                        <div style="opacity:.55; font-size:.72rem; letter-spacing:2px; text-transform:uppercase;">
+                            Conversation → Data
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>Venda enquanto<br>você descansa.</h3>
+                        <p>Nossa IA qualifica leads, supera objeções e fecha agendamentos no WhatsApp de forma autônoma, mantendo o tom de voz da sua marca sem falhas.</p>
+                    </div>
+
+                    <div class="vx-meta-row">
+                        <div class="vx-chip">
+                            <span class="vx-icon"><i class="fa-solid fa-circle-check"></i></span>
+                            Qualificação automática
+                        </div>
+                        <div class="vx-chip">
+                            <span class="vx-icon"><i class="fa-solid fa-bolt"></i></span>
+                            24/7 sem pausa
+                        </div>
+                    </div>
+
+                    <div class="vx-bullets">
+                        <div class="vx-bullet">
+                            <span class="vx-icon"><i class="fa-solid fa-stopwatch"></i></span>
+                            <div>
+                                Respostas consistentes em segundos
+                                <span>sem “sumir”, sem esquecer, sem variar o tom</span>
+                            </div>
+                        </div>
+
+                        <div class="vx-bullet">
+                            <span class="vx-icon"><i class="fa-solid fa-calendar-check"></i></span>
+                            <div>
+                                Agendamento direto no WhatsApp
+                                <span>com confirmação e registro do lead</span>
+                            </div>
+                        </div>
+
+                        <div class="vx-bullet">
+                            <span class="vx-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                Compliance e controle
+                                <span>regras de conversa e limites definidos por você</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vx-mini">
+                        <div class="vx-mini-top">
+                            <span>Preview</span>
+                            <span>Ready</span>
+                        </div>
+                        <div class="vx-mini-lines">
+                            <div class="vx-line"></div>
+                            <div class="vx-line"></div>
+                            <div class="vx-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2 -->
+            <div class="card c-2 reveal">
+                <div class="vx-wrap">
+                    <div>
+                        <h3>Escala Infinita</h3>
+                        <p>Atenda 1 ou 10.000 clientes simultaneamente com a mesma qualidade e precisão cirúrgica.</p>
+                    </div>
+
+                    <div class="vx-right-stack">
+                        <div class="vx-panel">
+                            <div class="vx-panel-top">
+                                <span>CONCURRENCY</span>
+                                <span>STABLE</span>
+                            </div>
+                            <div class="vx-bar s3"></div>
+                            <div class="vx-list">
+                                <div class="vx-li"><span>Filas inteligentes</span><em>AUTO</em></div>
+                                <div class="vx-li"><span>Prioridade por intenção</span><em>SMART</em></div>
+                                <div class="vx-li"><span>Fallback seguro</span><em>ON</em></div>
+                            </div>
+                        </div>
+
+                        <div class="vx-panel">
+                            <div class="vx-panel-top">
+                                <span>CONSISTENCY</span>
+                                <span>LOCKED</span>
+                            </div>
+                            <div class="vx-bar s2"></div>
+                            <div class="vx-list">
+                                <div class="vx-li"><span>Tom de voz fixo</span><em>BRAND</em></div>
+                                <div class="vx-li"><span>Respostas padronizadas</span><em>CLEAN</em></div>
+                                <div class="vx-li"><span>Sem variação de humor</span><em>24/7</em></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vx-kpi" style="grid-template-columns: 1fr;">
+                        <div class="vx-kpi-item">
+                            <b>&lt; 1.2s</b>
+                            <small>tempo médio de resposta</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 3 -->
+            <div class="card c-3 reveal">
+                <div style="flex: 2; position: relative; z-index: 2;">
+                    <div class="vx-wrap">
+                        <div>
+                            <h3>Dados que decidem.</h3>
+                            <p>Transforme conversas informais em dados estruturados. Sincronização nativa com CRM para que você nunca perca uma oportunidade de ouro.</p>
+                        </div>
+
+                        <div class="vx-kpi">
+                            <div class="vx-kpi-item">
+                                <b>Leads</b>
+                                <small>captura automática</small>
+                            </div>
+                            <div class="vx-kpi-item">
+                                <b>Motivos</b>
+                                <small>objeções mapeadas</small>
+                            </div>
+                            <div class="vx-kpi-item">
+                                <b>Próximo passo</b>
+                                <small>ação sugerida</small>
+                            </div>
+                        </div>
+
+                        <div class="vx-mini" style="max-width: 620px;">
+                            <div class="vx-mini-top">
+                                <span>CRM SYNC</span>
+                                <span>READY</span>
+                            </div>
+                            <div class="vx-mini-lines">
+                                <div class="vx-line" style="height:12px;"></div>
+                                <div class="vx-line" style="height:12px;"></div>
+                                <div class="vx-line" style="height:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="flex: 1; font-family: 'Outfit'; font-size: clamp(1rem, 5vw, 4rem); opacity: 0.03; text-align: right; line-height: 0.9; position: relative; z-index: 1;">
+                    AI_DRIVEN_GROWTH<br>NODE_ONLINE
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-title">
+            JOIN THE<br>ELITE.
+        </div>
+        <a href="#" class="btn-cta js-whatsapp" style="border-color: #000; color: #000; padding: 2.5rem 6rem; font-size: 1.3rem;">Start Your Evolution</a>
+        <p style="margin-top: 12vh; opacity: 0.3; font-size: 0.75rem; letter-spacing: 4px; font-weight: 600;">VENTAX LABS — POWERED BY NEURAL NETWORKS</p>
+    </footer>
+
+    <script>
+        // Init Lenis
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Loader
+        let count = 0;
+        const loader = document.getElementById('loader');
+        const loadInterval = setInterval(() => {
+            count++;
+            loader.innerText = count.toString().padStart(2, '0');
+            if(count === 100) {
+                clearInterval(loadInterval);
+                gsap.to(loader, { 
+                    yPercent: -100, 
+                    duration: 1.2, 
+                    ease: "power4.inOut",
+                    onComplete: () => loader.style.display = 'none'
+                });
+            }
+        }, 12);
+
+        // --- Neural Brain Interactions (GSAP + ScrollTrigger) ---
+(() => {
+  const brainWrap = document.querySelector('.brain-visual-wrap');
+  const brainImg = document.getElementById('cyber-brain');
+  const nodes = gsap.utils.toArray('.brain-node');
+  const bgText = document.querySelector('.neural-bg-text');
+
+  // SVG overlay for connection lines
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('class', 'brain-svg-lines');
+  svg.style.position = 'absolute';
+  svg.style.inset = '0';
+  svg.style.pointerEvents = 'none';
+  brainWrap.appendChild(svg);
+
+  // Helpers
+  const getCenter = (el) => {
+    const r = el.getBoundingClientRect();
+    const parent = brainWrap.getBoundingClientRect();
+    return { x: r.left - parent.left + r.width / 2, y: r.top - parent.top + r.height / 2 };
+  };
+  const debounce = (fn, t = 50) => { let id; return () => { clearTimeout(id); id = setTimeout(fn, t); }; };
+
+  // Draw lines between brain center and each node
+  let lines = [];
+  function drawLines() {
+    svg.innerHTML = '';
+    lines = [];
+    const brainC = getCenter(brainImg);
+    nodes.forEach(node => {
+      const p = getCenter(node);
+      const line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('x1', brainC.x);
+      line.setAttribute('y1', brainC.y);
+      line.setAttribute('x2', p.x);
+      line.setAttribute('y2', p.y);
+      line.setAttribute('stroke', 'rgba(255,138,0,0.18)');
+      line.setAttribute('stroke-width', '2');
+      line.setAttribute('stroke-linecap', 'round');
+      line.setAttribute('stroke-dasharray', '1200');
+      line.setAttribute('stroke-dashoffset', '1200');
+      svg.appendChild(line);
+      lines.push({ el: line, node });
+    });
+  }
+
+  // Animate line draw
+  function revealLines() {
+    lines.forEach((l, i) => {
+      gsap.to(l.el, { strokeDashoffset: 0, duration: 0.9, delay: i * 0.08, ease: 'power2.out' });
+    });
+  }
+
+  // Parallax mouse movement
+  if (window.matchMedia('(pointer: fine)').matches) {
+    brainWrap.addEventListener('pointermove', (e) => {
+      const bounds = brainWrap.getBoundingClientRect();
+      const x = ((e.clientX - bounds.left) / bounds.width - 0.5) * 2; // -1..1
+      const y = ((e.clientY - bounds.top) / bounds.height - 0.5) * 2;
+      gsap.to(brainImg, { x: x * 30, y: y * 18, rotation: x * 6, duration: 0.6, ease: 'power3.out' });
+      gsap.to(bgText, { x: x * -120, y: y * -40, duration: 0.8, ease: 'power3.out' });
+      nodes.forEach((node, i) => {
+        gsap.to(node, { x: x * (i % 2 ? -12 : 12), y: y * 8, duration: 0.6, ease: 'power3.out' });
+      });
+    });
+    brainWrap.addEventListener('pointerleave', () => {
+      gsap.to([brainImg, bgText], { x: 0, y: 0, rotation: 0, duration: 0.6, ease: 'power3.out' });
+      nodes.forEach(node => gsap.to(node, { x: 0, y: 0, duration: 0.6, ease: 'power3.out' }));
+    });
+
+    // Fallback: se por algum motivo o evento pointermove não atingir o container,
+    // usamos document.mousemove para detectar quando o cursor estiver sobre a área do cérebro
+    document.addEventListener('mousemove', (e) => {
+      const bounds = brainWrap.getBoundingClientRect();
+      // se o ponteiro estiver fora da área do brainWrap, resetamos e saímos
+      if (e.clientX < bounds.left || e.clientX > bounds.right || e.clientY < bounds.top || e.clientY > bounds.bottom) {
+        gsap.to([brainImg, bgText], { x: 0, y: 0, rotation: 0, duration: 0.6, ease: 'power3.out' });
+        nodes.forEach(node => gsap.to(node, { x: 0, y: 0, duration: 0.6, ease: 'power3.out' }));
+        return;
+      }
+      const x = ((e.clientX - bounds.left) / bounds.width - 0.5) * 2;
+      const y = ((e.clientY - bounds.top) / bounds.height - 0.5) * 2;
+      gsap.to(brainImg, { x: x * 30, y: y * 18, rotation: x * 6, duration: 0.6, ease: 'power3.out' });
+      gsap.to(bgText, { x: x * -120, y: y * -40, duration: 0.8, ease: 'power3.out' });
+      nodes.forEach((node, i) => {
+        gsap.to(node, { x: x * (i % 2 ? -12 : 12), y: y * 8, duration: 0.6, ease: 'power3.out' });
+      });
+    }, { passive: true });
+  }
+
+  // Node hover effects (label scale + brain glow + line highlight)
+  function highlightLineFor(node, on = true) {
+    const pair = lines.find(l => l.node === node);
+    if (!pair) return;
+    gsap.to(pair.el, { stroke: on ? 'rgba(255,138,0,0.9)' : 'rgba(255,138,0,0.18)', strokeWidth: on ? 3.5 : 2, duration: 0.25 });
+  }
+
+  nodes.forEach(node => {
+    node.addEventListener('mouseenter', () => {
+      const label = node.querySelector('.brain-label');
+      gsap.to(label, { scale: 1.05, y: -4, duration: 0.22, transformOrigin: 'center' });
+      gsap.to(brainImg, { filter: 'drop-shadow(0 0 110px rgba(255,120,0,0.32))', duration: 0.25 });
+      highlightLineFor(node, true);
+    });
+    node.addEventListener('mouseleave', () => {
+      const label = node.querySelector('.brain-label');
+      gsap.to(label, { scale: 1, y: 0, duration: 0.22 });
+      gsap.to(brainImg, { filter: 'drop-shadow(0 0 50px rgba(255,120,0,0.2))', duration: 0.25 });
+      highlightLineFor(node, false);
+    });
+    // optional: click to show details (example)
+    node.addEventListener('click', () => {
+      gsap.fromTo(node, { scale: 1 }, { scale: 1.02, yoyo: true, repeat: 1, duration: 0.18, ease: 'power1.inOut' });
+    });
+  });
+
+  // Ensure nodes start hidden (will be revealed by ScrollTrigger / onEnter handlers)
+  gsap.set(nodes, { opacity: 0, y: 40 });
+
+  // If the neural section is already visible on load, reveal immediately
+  const brainSection = document.querySelector('.neural-brain-section');
+  function revealIfInView() {
+    if (!brainSection) return;
+    const rect = brainSection.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      drawLines();
+      revealLines();
+      gsap.to(nodes, { opacity: 1, y: 0, stagger: 0.12, duration: 0.8, ease: 'power2.out' });
+      ScrollTrigger.refresh();
+    }
+  }
+  revealIfInView();
+  window.addEventListener('load', revealIfInView);
+
+  // Make sure lines are drawn when section enters view
+  ScrollTrigger.create({
+    trigger: '.neural-brain-section',
+    start: 'top 85%',
+    onEnter: () => { drawLines(); revealLines(); gsap.to(nodes, { opacity: 1, y: 0, stagger: 0.12, duration: 0.8, ease: 'power2.out' }); },
+    onEnterBack: () => { drawLines(); revealLines(); gsap.to(nodes, { opacity: 1, y: 0, stagger: 0.12, duration: 0.8, ease: 'power2.out' }); }
+  });
+
+  // Recalculate on resize / scroll (debounced)
+  const recalc = debounce(() => { drawLines(); });
+  window.addEventListener('resize', recalc);
+  window.addEventListener('orientationchange', recalc);
+  // In case layout shifts, re-draw after small delay
+  setTimeout(drawLines, 300);
+})();
+
+        // Cursor
+        const cursor = document.getElementById('cursor');
+
+        // some browsers fire mousemove even when cursor is outside; keep clean
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.25, ease: "power2.out" });
+            cursor.style.opacity = '1';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursor.style.opacity = '0';
+        });
+        document.addEventListener('mouseenter', () => {
+            cursor.style.opacity = '1';
+        });
+
+        // GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Horizontal
+        let sections = gsap.utils.toArray(".h-section");
+        gsap.to(sections, {
+            xPercent: -100 * (sections.length - 1),
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".horizontal-scroll",
+                pin: true,
+                scrub: 1,
+                end: () => "+=" + document.querySelector(".horizontal-scroll").offsetWidth
+            }
+        });
+
+        // Parallax Sutil (desktop ok; mobile também, mas mais suave)
+        gsap.to("#hero-robot", {
+            y: 80,
+            scale: 1.05,
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // Revelação
+        gsap.utils.toArray('.reveal').forEach(card => {
+            gsap.from(card, {
+                opacity: 0,
+                y: 80,
+                scale: 0.95,
+                duration: 1.4,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 92%",
+                }
+            });
+        });
+
+        // hand-section.js
+(function initHandSection() {
+  if (!document.querySelector('.hand-reveal-section')) return;
+
+  // garante plugin
+  gsap.registerPlugin(ScrollTrigger);
+
+  // 1) entrada da mão
+  gsap.from("#robot-hand", {
+    x: 500,
+    y: 100,
+    rotation: 25,
+    scale: 0.8,
+    scrollTrigger: {
+      trigger: ".hand-reveal-section",
+      start: "top bottom",
+      end: "center center",
+      scrub: 1.5
+    }
+  });
+
+  // 2) linha do scanner
+  gsap.to(".scan-line", {
+    opacity: 1,
+    left: "80%",
+    duration: 2,
+    repeat: -1,
+    yoyo: true,
+    ease: "sine.inOut"
+  });
+
+  // 3) círculos HUD girando
+  gsap.to(".hud-circle", {
+    rotation: 360,
+    duration: 20,
+    repeat: -1,
+    ease: "none"
+  });
+
+  // 4) flicker nos dados HUD
+  gsap.to(".hud-data-points", {
+    opacity: 0.2,
+    duration: 0.1,
+    repeat: -1,
+    repeatDelay: () => Math.random() * 2,
+    yoyo: true
+  });
+
+  // 5) revelar textos (scope apenas para a seção da mão)
+  gsap.set('.hand-reveal-section .reveal-up', { opacity: 0, y: 100 });
+
+  function revealHandIfInView() {
+    const hs = document.querySelector('.hand-reveal-section');
+    if (!hs) return;
+    const rect = hs.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      gsap.to('.hand-reveal-section .reveal-up', { opacity: 1, y: 0, stagger: 0.18, duration: 0.8, ease: 'power2.out' });
+      ScrollTrigger.refresh();
+    }
+  }
+  revealHandIfInView();
+  window.addEventListener('load', revealHandIfInView);
+
+  gsap.from('.hand-reveal-section .reveal-up', {
+    y: 100,
+    opacity: 0,
+    stagger: 0.2,
+    scrollTrigger: {
+      trigger: '.hand-reveal-section',
+      start: 'top 60%'
+    }
+  });
+
+  // Garantir reveal se o usuário rolar (fallback para casos onde trigger não dispara)
+  ScrollTrigger.create({
+    trigger: '.hand-reveal-section',
+    start: 'top 80%',
+    onEnter: () => gsap.to('.hand-reveal-section .reveal-up', { opacity: 1, y: 0, stagger: 0.18, duration: 0.8, ease: 'power2.out' }),
+    onEnterBack: () => gsap.to('.hand-reveal-section .reveal-up', { opacity: 1, y: 0, stagger: 0.18, duration: 0.8, ease: 'power2.out' })
+  });
+
+  // Debounced scroll listener para forçar reveal em navegadores/condições inesperadas
+  const debouncedRevealHand = (() => { let id; return () => { clearTimeout(id); id = setTimeout(() => { const hs = document.querySelector('.hand-reveal-section'); if(!hs) return; const rect = hs.getBoundingClientRect(); if (rect.top < window.innerHeight && rect.bottom > 0) { gsap.to('.hand-reveal-section .reveal-up', { opacity: 1, y: 0, stagger: 0.18, duration: 0.6, ease: 'power2.out' }); ScrollTrigger.refresh(); } }, 120); }; })();
+  window.addEventListener('scroll', debouncedRevealHand, { passive: true });
+  window.addEventListener('resize', debouncedRevealHand);
+
+})();
+
+        // WhatsApp
+        const PHONE = "5511999999999"; 
+        const MSG = "Olá! Desejo conhecer a inteligência VentaX.";
+        document.querySelectorAll('.js-whatsapp').forEach(el => {
+            el.href = `https://wa.me/${PHONE}?text=${encodeURIComponent(MSG)}`;
+            el.target = "_blank";
+        });
+    </script>
+</body>
+</html>
